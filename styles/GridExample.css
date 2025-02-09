@@ -2,6 +2,10 @@
   display: flex;
   gap: 20px;
   padding: 20px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 200px);
 }
 
 .svg-palette {
@@ -18,8 +22,36 @@
   padding: 10px;
   border: 1px solid #eee;
   border-radius: 4px;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .draggable-svg:hover {
   background-color: #f5f5f5;
+}
+
+.draggable-svg:active {
+  cursor: grabbing;
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .svg-palette {
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
+  }
+
+  .draggable-svg {
+    padding: 15px; /* Larger touch target */
+  }
 }

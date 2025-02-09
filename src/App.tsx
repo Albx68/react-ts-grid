@@ -2,9 +2,24 @@ import React from "react";
 import { DraggableGrid } from "../components/DraggableGrid";
 import "../styles/GridExample.css";
 
+// Add this to make TypeScript happy with our global variable
+declare global {
+  interface Window {
+    draggedSVG: string | null;
+  }
+}
+
 function App() {
-  const handleDragStart = (e: React.DragEvent, svg: string) => {
-    e.dataTransfer.setData("application/svg", svg);
+  const handleDragStart = (
+    e: React.DragEvent | React.TouchEvent,
+    svg: string
+  ) => {
+    if ("dataTransfer" in e) {
+      e.dataTransfer.setData("application/svg", svg);
+    } else {
+      // Store the SVG data globally for touch events
+      window.draggedSVG = svg;
+    }
   };
 
   const sampleSVGs = [
@@ -28,12 +43,13 @@ function App() {
                 className="draggable-svg"
                 draggable
                 onDragStart={(e) => handleDragStart(e, svg)}
+                onTouchStart={(e) => handleDragStart(e, svg)}
                 dangerouslySetInnerHTML={{ __html: svg }}
               />
             ))}
           </div>
 
-          <DraggableGrid rows={10} columns={10} cellSize={40} gap={15} />
+          <DraggableGrid totalCells={30} cellSize={40} gap={15} />
         </div>
       </main>
     </div>

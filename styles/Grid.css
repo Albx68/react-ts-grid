@@ -1,5 +1,14 @@
+.grid-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 60vh;
+  align-items: center;
+}
+
 .grid-container {
   display: grid;
+  margin: auto;
 }
 
 .grid-cell {
@@ -10,6 +19,7 @@
   justify-content: center;
   transition: all 0.2s ease;
   background-color: transparent;
+  touch-action: none; /* Prevents scrolling while dragging on touch devices */
 }
 
 .grid-cell:hover {
@@ -18,4 +28,12 @@
 
 .grid-cell.is-over {
   background-color: #f0f0f0;
+}
+
+/* Make touch targets larger on mobile */
+@media (max-width: 768px) {
+  .grid-cell {
+    min-width: 50px;
+    min-height: 50px;
+  }
 }
