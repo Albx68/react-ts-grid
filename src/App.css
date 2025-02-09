@@ -40,3 +40,40 @@
 .read-the-docs {
   color: #888;
 }
+
+.app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+header {
+  margin-bottom: 2rem;
+}
+
+h1 {
+  font-size: 2.5em;
+  margin-bottom: 1rem;
+}
+
+.links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.links a {
+  color: #646cff;
+  text-decoration: inherit;
+}
+
+.links a:hover {
+  color: #535bf2;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+}

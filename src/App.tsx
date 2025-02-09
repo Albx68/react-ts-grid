@@ -1,35 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import { DraggableGrid } from "../components/DraggableGrid";
+import "../styles/GridExample.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const handleDragStart = (e: React.DragEvent, svg: string) => {
+    e.dataTransfer.setData("application/svg", svg);
+  };
+
+  const sampleSVGs = [
+    `<svg width="50" height="50" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="blue"/></svg>`,
+    `<svg width="50" height="50" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60" fill="red"/></svg>`,
+    `<svg width="50" height="50" viewBox="0 0 100 100"><polygon points="50,20 80,80 20,80" fill="green"/></svg>`,
+  ];
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="app">
+      <header>
+        <h1>SVG Grid Example</h1>
+      </header>
+
+      <main>
+        <div className="container">
+          <div className="svg-palette">
+            {sampleSVGs.map((svg, index) => (
+              <div
+                key={index}
+                className="draggable-svg"
+                draggable
+                onDragStart={(e) => handleDragStart(e, svg)}
+                dangerouslySetInnerHTML={{ __html: svg }}
+              />
+            ))}
+          </div>
+
+          <DraggableGrid rows={10} columns={10} cellSize={40} gap={15} />
+        </div>
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;

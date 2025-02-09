@@ -1,0 +1,21 @@
+.grid-container {
+  display: grid;
+}
+
+.grid-cell {
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background-color: transparent;
+}
+
+.grid-cell:hover {
+  border-color: #999;
+}
+
+.grid-cell.is-over {
+  background-color: #f0f0f0;
+}

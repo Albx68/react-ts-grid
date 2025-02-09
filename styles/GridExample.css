@@ -1,0 +1,25 @@
+.container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+.svg-palette {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.draggable-svg {
+  cursor: grab;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+.draggable-svg:hover {
+  background-color: #f5f5f5;
+}
