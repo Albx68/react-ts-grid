@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { DraggableGrid } from "../components/DraggableGrid";
 import "../styles/GridExample.css";
 
@@ -10,16 +10,40 @@ declare global {
 }
 
 function App() {
-  const handleDragStart = (
-    e: React.DragEvent | React.TouchEvent,
-    svg: string
-  ) => {
-    if ("dataTransfer" in e) {
-      e.dataTransfer.setData("application/svg", svg);
-    } else {
-      // Store the SVG data globally for touch events
-      window.draggedSVG = svg;
-    }
+  const [isDragging, setIsDragging] = useState(false);
+
+  useEffect(() => {
+    // Add non-passive touch event listeners to the draggable elements
+    const elements = document.getElementsByClassName("draggable-svg");
+    Array.from(elements).forEach((element) => {
+      element.addEventListener(
+        "touchstart",
+        (e) => {
+          e.preventDefault();
+        },
+        { passive: false }
+      );
+    });
+
+    return () => {
+      // Clean up event listeners
+      Array.from(elements).forEach((element) => {
+        element.removeEventListener("touchstart", (e) => e.preventDefault());
+      });
+    };
+  }, []);
+
+  const handleDragStart = (e: React.DragEvent, svg: string) => {
+    e.dataTransfer.setData("application/svg", svg);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent, svg: string) => {
+    window.draggedSVG = svg;
+    setIsDragging(true);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
   };
 
   const sampleSVGs = [
@@ -35,7 +59,7 @@ function App() {
       </header>
 
       <main>
-        <div className="container">
+        <div className={`container ${isDragging ? "is-dragging" : ""}`}>
           <div className="svg-palette">
             {sampleSVGs.map((svg, index) => (
               <div
@@ -43,7 +67,8 @@ function App() {
                 className="draggable-svg"
                 draggable
                 onDragStart={(e) => handleDragStart(e, svg)}
-                onTouchStart={(e) => handleDragStart(e, svg)}
+                onTouchStart={(e) => handleTouchStart(e, svg)}
+                onTouchEnd={handleTouchEnd}
                 dangerouslySetInnerHTML={{ __html: svg }}
               />
             ))}

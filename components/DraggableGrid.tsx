@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../styles/Grid.css";
 
 interface GridProps {
@@ -15,6 +15,7 @@ export const DraggableGrid: React.FC<GridProps> = ({
   const [columns, setColumns] = useState(10);
   const [cells, setCells] = useState<(React.ReactNode | null)[]>([]);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const touchTargetRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const calculateLayout = () => {
@@ -48,25 +49,64 @@ export const DraggableGrid: React.FC<GridProps> = ({
     };
   }, [totalCells]);
 
-  const handleDragOver = (
-    e: React.DragEvent | React.TouchEvent,
-    index: number
-  ) => {
+  useEffect(() => {
+    // Add non-passive touch event listeners to the grid wrapper
+    const wrapper = touchTargetRef.current;
+    if (wrapper) {
+      wrapper.addEventListener(
+        "touchmove",
+        (e) => {
+          e.preventDefault();
+          const touch = e.touches[0];
+          const elements = document.elementsFromPoint(
+            touch.clientX,
+            touch.clientY
+          );
+          const cellElement = elements.find((el) =>
+            el.classList.contains("grid-cell")
+          );
+
+          if (cellElement) {
+            const index = parseInt(
+              cellElement.getAttribute("data-index") || "-1"
+            );
+            if (index >= 0) {
+              setDragOverIndex(index);
+            }
+          }
+        },
+        { passive: false }
+      );
+    }
+
+    return () => {
+      if (wrapper) {
+        wrapper.removeEventListener("touchmove", (e) => e.preventDefault());
+      }
+    };
+  }, []);
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    e.preventDefault();
+    if (dragOverIndex !== null && window.draggedSVG) {
+      const newCells = [...cells];
+      newCells[dragOverIndex] = (
+        <div dangerouslySetInnerHTML={{ __html: window.draggedSVG }} />
+      );
+      setCells(newCells);
+      window.draggedSVG = null;
+    }
+    setDragOverIndex(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
     setDragOverIndex(index);
   };
 
-  const handleDrop = (e: React.DragEvent | React.TouchEvent, index: number) => {
+  const handleDrop = (e: React.DragEvent, index: number) => {
     e.preventDefault();
-    let svgData: string | null = null;
-
-    if ("dataTransfer" in e) {
-      svgData = e.dataTransfer.getData("application/svg");
-    } else if (window.draggedSVG) {
-      svgData = window.draggedSVG;
-      window.draggedSVG = null;
-    }
-
+    const svgData = e.dataTransfer.getData("application/svg");
     if (svgData) {
       const newCells = [...cells];
       newCells[index] = <div dangerouslySetInnerHTML={{ __html: svgData }} />;
@@ -80,7 +120,11 @@ export const DraggableGrid: React.FC<GridProps> = ({
   };
 
   return (
-    <div className="grid-wrapper">
+    <div
+      className="grid-wrapper"
+      onTouchEnd={handleTouchEnd}
+      ref={touchTargetRef}
+    >
       <div
         className="grid-container"
         style={{
@@ -91,6 +135,7 @@ export const DraggableGrid: React.FC<GridProps> = ({
         {cells.slice(0, totalCells).map((cell, index) => (
           <div
             key={index}
+            data-index={index}
             className={`grid-cell ${dragOverIndex === index ? "is-over" : ""}`}
             style={{
               width: `${cellSize}px`,
@@ -99,8 +144,6 @@ export const DraggableGrid: React.FC<GridProps> = ({
             onDragOver={(e) => handleDragOver(e, index)}
             onDrop={(e) => handleDrop(e, index)}
             onDragLeave={handleDragLeave}
-            onTouchMove={(e) => handleDragOver(e, index)}
-            onTouchEnd={(e) => handleDrop(e, index)}
           >
             {cell}
           </div>
